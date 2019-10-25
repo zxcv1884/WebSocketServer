@@ -12,6 +12,8 @@ namespace testserver
 {
     class Add : WebSocketBehavior
     {
+        static Timer RunTimer;
+
         private string _name;
         private static int _number = 0;
         private string _prefix;
@@ -106,29 +108,33 @@ namespace testserver
             if (TestJson(data))
             {
                 var param = JToken.Parse(data);
-                if (Convert.ToInt32(param["Status"]) == 0 )
+                if (Convert.ToInt32(param["Status"]) == 0 && status == 1)
                 {
                     var Status = param["Status"].ToObject<int>();
                     var Peptide = param["Peptide"].ToObject<int>();
                     var Tubes = param["Tubes"].ToObject<int>();
                     var TubeNum = param["TubeNum"].ToObject<int>();
                     var TubeML = param["TubeML"].ToObject<int>();
-
-                    purification = param["Purification"].ToObject<List<Purification>>();
-                    washcycle = param["WashCycle"].ToObject<List<WashCycle>>();
-
                     tubeml = TubeML;
                     status = Status;
                     peptide = Peptide;
                     tubes = Tubes;
                     tubeNum = TubeNum;
+                    RunTimer = new Timer(Run, null, 0, 100);
 
-                    //Send(JsonConvert.SerializeObject(new {  Status, Peptide, TubeNum, Time =0 }));
-                    //dynamic routes_list = (Dictionary<string, object>)JsonConvert.DeserializeObject(data);
-
+                    purification = param["Purification"].ToObject<List<Purification>>();
+                    washcycle = param["WashCycle"].ToObject<List<WashCycle>>();
                 }
-                else
+                else if (Convert.ToInt32(param["Status"]) == 0)
                 {
+                    var Status = param["Status"].ToObject<int>();
+                    var Peptide = param["Peptide"].ToObject<int>();
+                    var Tubes = param["Tubes"].ToObject<int>();
+                    var TubeNum = param["TubeNum"].ToObject<int>();
+                    var TubeML = param["TubeML"].ToObject<int>();
+                    purification = param["Purification"].ToObject<List<Purification>>();
+                    washcycle = param["WashCycle"].ToObject<List<WashCycle>>();
+                    status = 0;
                     time = 0;
                     pumpA = 0;
                     pumpB = 0;
@@ -136,203 +142,188 @@ namespace testserver
                     pumpD = 0;
                     waste = 0;
                     holding = 0;
+                    tubeml = TubeML;
+                    status = Status;
+                    peptide = Peptide;
+                    tubes = Tubes;
+                    tubeNum = TubeNum;
+                    RunTimer = new Timer(Run, null, 0, 100);
+                }
+            }
+            else if(data == "stop")
+            {
+                RunTimer.Dispose();
+                status = 2;
+                time = 0;
+                pumpA = 0;
+                pumpB = 0;
+                pumpC = 0;
+                pumpD = 0;
+                waste = 0;
+                holding = 0;
+            }
+            else if(data == "pause")
+            {
+                RunTimer.Dispose();
+                status = 1;
+            }
+            else
+            {
+                var root = new
+                {
+                    status,
+                    peptide,
+                    tubeNum,
+                    time,
+                    pumpA,
+                    pumpB,
+                    pumpC,
+                    pumpD,
+                    pumpAml,
+                    pumpBml,
+                    pumpCml,
+                    pumpDml,
+                    pressure,
+                    waste,
+                    holding,
+                    au,
+                    wavelength,
+                };
+                Send(JsonConvert.SerializeObject(root));
+
+            }
+        }
+        private void Run(Object o)
+        {
+            if (purificationCounter <= purification.Count - 1)
+            {
+                if (time <= purification[purificationCounter].TimeStart)
+                {
+                    pumpA = purification[purificationCounter].PumpAStart;
+                    pumpB = purification[purificationCounter].PumpBStart;
+                    pumpC = purification[purificationCounter].PumpCStart;
+                    pumpD = purification[purificationCounter].PumpDStart;
+                }
+                pumpAspacing = (double)(purification[purificationCounter].PumpAEnd - purification[purificationCounter].PumpAStart) / (purification[purificationCounter].TimeEnd - purification[purificationCounter].TimeStart) / 60 / 10;
+                pumpBspacing = (double)(purification[purificationCounter].PumpBEnd - purification[purificationCounter].PumpBStart) / (purification[purificationCounter].TimeEnd - purification[purificationCounter].TimeStart) / 60 / 10;
+                pumpCspacing = (double)(purification[purificationCounter].PumpCEnd - purification[purificationCounter].PumpCStart) / (purification[purificationCounter].TimeEnd - purification[purificationCounter].TimeStart) / 60 / 10;
+                pumpDspacing = (double)(purification[purificationCounter].PumpDEnd - purification[purificationCounter].PumpDStart) / (purification[purificationCounter].TimeEnd - purification[purificationCounter].TimeStart) / 60 / 10;
+
+                pumpA += pumpAspacing;
+                pumpB += pumpBspacing;
+                pumpC += pumpCspacing;
+                pumpD += pumpDspacing;
+                if (purification[purificationCounter].FlowDestination == 1)
+                {
+                    waste += (double)purification[purificationCounter].FlowRate / 600;
+                    pumpAml = (double)pumpA * purification[purificationCounter].FlowRate * 0.01;
+                    pumpBml = (double)pumpB * purification[purificationCounter].FlowRate * 0.01;
+                    pumpCml = (double)pumpC * purification[purificationCounter].FlowRate * 0.01;
+                    pumpDml = (double)pumpD * purification[purificationCounter].FlowRate * 0.01;
+                }
+                else if (purification[purificationCounter].FlowDestination == 2)
+                {
+                    holding += (double)purification[purificationCounter].FlowRate / 600;
+                    pumpAml = (double)pumpA * purification[purificationCounter].FlowRate * 0.01;
+                    pumpBml = (double)pumpB * purification[purificationCounter].FlowRate * 0.01;
+                    pumpCml = (double)pumpC * purification[purificationCounter].FlowRate * 0.01;
+                    pumpDml = (double)pumpD * purification[purificationCounter].FlowRate * 0.01;
+                }
+                else
+                {
+                    nowtubeml += (double)purification[purificationCounter].FlowRate / 600;
+                    if (nowtubeml >= tubeml)
+                    {
+                        tubeNum++;
+                        nowtubeml = 0;
+                    }
+                    pumpAml = (double)pumpA * purification[purificationCounter].FlowRate * 0.01;
+                    pumpBml = (double)pumpB * purification[purificationCounter].FlowRate * 0.01;
+                    pumpCml = (double)pumpC * purification[purificationCounter].FlowRate * 0.01;
+                    pumpDml = (double)pumpD * purification[purificationCounter].FlowRate * 0.01;
+
+                }
+                Random random = new Random();
+                pressure = random.Next(20, 50);
+                au = random.Next(0, 100);
+                wavelength = random.Next(0, 100);
+
+                time += 0.0016666666666667;
+                if (time >= purification[purificationCounter].TimeEnd)
+                {
+                    purificationCounter++;
+                }
+            }
+            else if (washcycleCounter <= washcycle.Count - 1)
+            {
+                if (washcycleTemp == 0)
+                {
+                    time = 0;
+                }
+                washcycleTemp++;
+                if (time <= washcycle[washcycleCounter].TimeStart)
+                {
+                    pumpA = washcycle[washcycleCounter].PumpAStart;
+                    pumpB = washcycle[washcycleCounter].PumpBStart;
+                    pumpC = washcycle[washcycleCounter].PumpCStart;
+                    pumpD = washcycle[washcycleCounter].PumpDStart;
+                }
+                pumpAspacing = (double)(washcycle[washcycleCounter].PumpAEnd - washcycle[washcycleCounter].PumpAStart) / (washcycle[washcycleCounter].TimeEnd - washcycle[washcycleCounter].TimeStart) / 60 / 10;
+                pumpBspacing = (double)(washcycle[washcycleCounter].PumpBEnd - washcycle[washcycleCounter].PumpBStart) / (washcycle[washcycleCounter].TimeEnd - washcycle[washcycleCounter].TimeStart) / 60 / 10;
+                pumpCspacing = (double)(washcycle[washcycleCounter].PumpCEnd - washcycle[washcycleCounter].PumpCStart) / (washcycle[washcycleCounter].TimeEnd - washcycle[washcycleCounter].TimeStart) / 60 / 10;
+                pumpDspacing = (double)(washcycle[washcycleCounter].PumpDEnd - washcycle[washcycleCounter].PumpDStart) / (washcycle[washcycleCounter].TimeEnd - washcycle[washcycleCounter].TimeStart) / 60 / 10;
+
+                pumpA += pumpAspacing;
+                pumpB += pumpBspacing;
+                pumpC += pumpCspacing;
+                pumpD += pumpDspacing;
+                if (washcycle[washcycleCounter].FlowDestination == 1)
+                {
+                    waste += (double)washcycle[washcycleCounter].FlowRate / 600;
+                    pumpAml = (double)pumpA * washcycle[washcycleCounter].FlowRate * 0.01;
+                    pumpBml = (double)pumpB * washcycle[washcycleCounter].FlowRate * 0.01;
+                    pumpCml = (double)pumpC * washcycle[washcycleCounter].FlowRate * 0.01;
+                    pumpDml = (double)pumpD * washcycle[washcycleCounter].FlowRate * 0.01;
+                }
+                else if (washcycle[washcycleCounter].FlowDestination == 2)
+                {
+                    holding += (double)washcycle[washcycleCounter].FlowRate / 600;
+                    pumpAml = (double)pumpA * washcycle[washcycleCounter].FlowRate * 0.01;
+                    pumpBml = (double)pumpB * washcycle[washcycleCounter].FlowRate * 0.01;
+                    pumpCml = (double)pumpC * washcycle[washcycleCounter].FlowRate * 0.01;
+                    pumpDml = (double)pumpD * washcycle[washcycleCounter].FlowRate * 0.01;
+                }
+                else
+                {
+                    nowtubeml += (double)washcycle[washcycleCounter].FlowRate / 600;
+                    if (nowtubeml >= tubeml)
+                    {
+                        tubeNum++;
+                        nowtubeml = 0;
+                    }
+                    pumpAml = (double)pumpA * washcycle[washcycleCounter].FlowRate * 0.01;
+                    pumpBml = (double)pumpB * washcycle[washcycleCounter].FlowRate * 0.01;
+                    pumpCml = (double)pumpC * washcycle[washcycleCounter].FlowRate * 0.01;
+                    pumpDml = (double)pumpD * washcycle[washcycleCounter].FlowRate * 0.01;
+
+                }
+                Random random = new Random();
+                pressure = random.Next(20, 50);
+                au = random.Next(0, 100);
+                wavelength = random.Next(0, 100);
+                time += 0.0016666666666667;
+                if (time >= washcycle[washcycleCounter].TimeEnd)
+                {
+                    washcycleCounter++;
                 }
             }
             else
             {
-
-
-                if (purificationCounter <= purification.Count - 1)
-                {
-                    if(time <= purification[purificationCounter].TimeStart)
-                    {
-                        pumpA = purification[purificationCounter].PumpAStart;
-                        pumpB = purification[purificationCounter].PumpBStart;
-                        pumpC = purification[purificationCounter].PumpCStart;
-                        pumpD = purification[purificationCounter].PumpDStart;
-                    }
-                    pumpAspacing = (double)(purification[purificationCounter].PumpAEnd - purification[purificationCounter].PumpAStart) / (purification[purificationCounter].TimeEnd - purification[purificationCounter].TimeStart) / 60 / 10;
-                    pumpBspacing = (double)(purification[purificationCounter].PumpBEnd - purification[purificationCounter].PumpBStart) / (purification[purificationCounter].TimeEnd - purification[purificationCounter].TimeStart) / 60 / 10;
-                    pumpCspacing = (double)(purification[purificationCounter].PumpCEnd - purification[purificationCounter].PumpCStart) / (purification[purificationCounter].TimeEnd - purification[purificationCounter].TimeStart) / 60 / 10;
-                    pumpDspacing = (double)(purification[purificationCounter].PumpDEnd - purification[purificationCounter].PumpDStart) / (purification[purificationCounter].TimeEnd - purification[purificationCounter].TimeStart) / 60 / 10;
-  
-                    pumpA += pumpAspacing;
-                    pumpB += pumpBspacing;
-                    pumpC += pumpCspacing;
-                    pumpD += pumpDspacing;
-                    if(purification[purificationCounter].FlowDestination == 1) {
-                        waste += (double)purification[purificationCounter].FlowRate / 600;
-                        pumpAml = (double)pumpA * purification[purificationCounter].FlowRate * 0.01;
-                        pumpBml = (double)pumpB * purification[purificationCounter].FlowRate * 0.01;
-                        pumpCml = (double)pumpC * purification[purificationCounter].FlowRate * 0.01;
-                        pumpDml = (double)pumpD * purification[purificationCounter].FlowRate * 0.01;
-                    }
-                    else if(purification[purificationCounter].FlowDestination ==2)
-                    {
-                        holding += (double)purification[purificationCounter].FlowRate / 600;
-                        pumpAml = (double)pumpA * purification[purificationCounter].FlowRate* 0.01;
-                        pumpBml = (double)pumpB * purification[purificationCounter].FlowRate * 0.01;
-                        pumpCml = (double)pumpC * purification[purificationCounter].FlowRate * 0.01;
-                        pumpDml = (double)pumpD * purification[purificationCounter].FlowRate  * 0.01;
-                    }
-                    else
-                    {
-                        nowtubeml += (double)purification[purificationCounter].FlowRate / 600;
-                        if (nowtubeml >= tubeml)
-                        {
-                            tubeNum++;
-                            nowtubeml = 0;
-                        }
-                        pumpAml = (double)pumpA * purification[purificationCounter].FlowRate * 0.01;
-                        pumpBml = (double)pumpB * purification[purificationCounter].FlowRate  * 0.01;
-                        pumpCml = (double)pumpC * purification[purificationCounter].FlowRate * 0.01;
-                        pumpDml = (double)pumpD * purification[purificationCounter].FlowRate  * 0.01;
-
-                    }
-                    Random random = new Random();
-                    pressure = random.Next(20, 50);
-                    au = random.Next(0, 100);
-                    wavelength = random.Next(0, 100);
-                    var root = new
-                    {
-                        status,
-                        peptide,
-                        tubeNum,
-                        time,
-                        pumpA,
-                        pumpB,
-                        pumpC,
-                        pumpD,
-                        pumpAml,
-                        pumpBml,
-                        pumpCml,
-                        pumpDml,
-                        pressure,
-                        waste,
-                        holding,
-                        au,
-                        wavelength,
-                    };
-                    time += 0.0016666666666667;
-                    Send(JsonConvert.SerializeObject(root));
-                    if (time >= purification[purificationCounter].TimeEnd)
-                    {
-                        purificationCounter++;
-                    }
-                }
-                else if (washcycleCounter <= washcycle.Count - 1)
-                {
-                    if(washcycleTemp == 0)
-                    {
-                        time = 0;
-                    }
-                        washcycleTemp++;
-                    if (time <= washcycle[washcycleCounter].TimeStart)
-                    {
-                        pumpA = washcycle[washcycleCounter].PumpAStart;
-                        pumpB = washcycle[washcycleCounter].PumpBStart;
-                        pumpC = washcycle[washcycleCounter].PumpCStart;
-                        pumpD = washcycle[washcycleCounter].PumpDStart;
-                    }
-                    pumpAspacing = (double)(washcycle[washcycleCounter].PumpAEnd - washcycle[washcycleCounter].PumpAStart) / (washcycle[washcycleCounter].TimeEnd - washcycle[washcycleCounter].TimeStart) / 60 / 10;
-                    pumpBspacing = (double)(washcycle[washcycleCounter].PumpBEnd - washcycle[washcycleCounter].PumpBStart) / (washcycle[washcycleCounter].TimeEnd - washcycle[washcycleCounter].TimeStart) / 60 / 10;
-                    pumpCspacing = (double)(washcycle[washcycleCounter].PumpCEnd - washcycle[washcycleCounter].PumpCStart) / (washcycle[washcycleCounter].TimeEnd - washcycle[washcycleCounter].TimeStart) / 60 / 10;
-                    pumpDspacing = (double)(washcycle[washcycleCounter].PumpDEnd - washcycle[washcycleCounter].PumpDStart) / (washcycle[washcycleCounter].TimeEnd - washcycle[washcycleCounter].TimeStart) / 60 / 10;
-
-                    pumpA += pumpAspacing;
-                    pumpB += pumpBspacing;
-                    pumpC += pumpCspacing;
-                    pumpD += pumpDspacing;
-                    if (washcycle[washcycleCounter].FlowDestination == 1)
-                    {
-                        waste += (double)washcycle[washcycleCounter].FlowRate / 600;
-                        pumpAml = (double)pumpA * washcycle[washcycleCounter].FlowRate * 0.01;
-                        pumpBml = (double)pumpB * washcycle[washcycleCounter].FlowRate * 0.01;
-                        pumpCml = (double)pumpC * washcycle[washcycleCounter].FlowRate * 0.01;
-                        pumpDml = (double)pumpD * washcycle[washcycleCounter].FlowRate * 0.01;
-                    }
-                    else if (washcycle[washcycleCounter].FlowDestination == 2)
-                    {
-                        holding += (double)washcycle[washcycleCounter].FlowRate / 600;
-                        pumpAml = (double)pumpA * washcycle[washcycleCounter].FlowRate * 0.01;
-                        pumpBml = (double)pumpB * washcycle[washcycleCounter].FlowRate * 0.01;
-                        pumpCml = (double)pumpC * washcycle[washcycleCounter].FlowRate * 0.01;
-                        pumpDml = (double)pumpD * washcycle[washcycleCounter].FlowRate * 0.01;
-                    }
-                    else
-                    {
-                        nowtubeml += (double)washcycle[washcycleCounter].FlowRate / 600;
-                        if (nowtubeml >= tubeml)
-                        {
-                            tubeNum++;
-                            nowtubeml = 0;
-                        }
-                        pumpAml = (double)pumpA * washcycle[washcycleCounter].FlowRate * 0.01;
-                        pumpBml = (double)pumpB * washcycle[washcycleCounter].FlowRate * 0.01;
-                        pumpCml = (double)pumpC * washcycle[washcycleCounter].FlowRate * 0.01;
-                        pumpDml = (double)pumpD * washcycle[washcycleCounter].FlowRate * 0.01;
-
-                    }
-                    Random random = new Random();
-                    pressure = random.Next(20, 50);
-                    au = random.Next(0, 100);
-                    wavelength = random.Next(0, 100);
-                    var root = new
-                    {
-                        status,
-                        peptide,
-                        tubeNum,
-                        time,
-                        pumpA,
-                        pumpB,
-                        pumpC,
-                        pumpD,
-                        pumpAml,
-                        pumpBml,
-                        pumpCml,
-                        pumpDml,
-                        pressure,
-                        waste,
-                        holding,
-                        au,
-                        wavelength,
-                    };
-                    time += 0.0016666666666667;
-                    Send(JsonConvert.SerializeObject(root));
-                    if (time >= washcycle[washcycleCounter].TimeEnd)
-                    {
-                        washcycleCounter++;
-                    }
-                }
-                else
-                {
-                    status = 3;
-                    var root = new
-                    {
-                        status,
-                        peptide,
-                        tubeNum,
-                        time,
-                        pumpA,
-                        pumpB,
-                        pumpC,
-                        pumpD,
-                        pumpAml,
-                        pumpBml,
-                        pumpCml,
-                        pumpDml,
-                        pressure,
-                        waste,
-                        holding,
-                        au,
-                        wavelength,
-                    };
-                    Send(JsonConvert.SerializeObject(root));
-                }
-
+                status = 3;
             }
+            Console.WriteLine("Status: " + status + "\tPeptide: " + peptide + "\tTubeNum: " + tubeNum + "\tTime: " + Math.Round(time, 2) + "\tPumpA: " + Math.Round(pumpA, 2) + "\tPumpB: " + Math.Round(pumpB, 2) + "\tPumpC: " + Math.Round(pumpC, 2) + "\tPumpD: " + Math.Round(pumpD, 2) + "\nPumpAml: " + Math.Round(pumpAml, 2) + "\tPumpBml: " + Math.Round(pumpBml, 2) + "\tPumpCml: " + Math.Round(pumpCml, 2) + "\tPumpDml: " + Math.Round(pumpDml, 2) + "\tWaste: " + Math.Round(waste, 2) + "\tHolding: " + Math.Round(holding, 2) + "\tPressure: " + Math.Round(pressure, 2) + "\tAU: " + Math.Round(au, 2) + "\tWaveLength: " + Math.Round(wavelength, 2));
+            Console.WriteLine("-------------------------------------------------------------------------------------------------------------------------------------------");
         }
-
         protected override void OnClose(CloseEventArgs e)
         {
             Console.WriteLine("Connection Closed");
@@ -354,7 +345,7 @@ namespace testserver
             }
             catch (JsonReaderException ex)
             {
-                Console.WriteLine(ex);
+               // Console.WriteLine(ex);
                 return false;
             }
         }
