@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using WebSocketSharp;
 using WebSocketSharp.Server;
 
-namespace testserver
+namespace WebSocketServerSimulation
 {
     class Add : WebSocketBehavior
     {
