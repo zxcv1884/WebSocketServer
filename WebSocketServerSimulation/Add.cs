@@ -210,6 +210,7 @@ namespace WebSocketServerSimulation
                 pumpBspacing = (double)(purification[purificationCounter].PumpBEnd - purification[purificationCounter].PumpBStart) / (purification[purificationCounter].TimeEnd - purification[purificationCounter].TimeStart) / 60 / 10;
                 pumpCspacing = (double)(purification[purificationCounter].PumpCEnd - purification[purificationCounter].PumpCStart) / (purification[purificationCounter].TimeEnd - purification[purificationCounter].TimeStart) / 60 / 10;
                 pumpDspacing = (double)(purification[purificationCounter].PumpDEnd - purification[purificationCounter].PumpDStart) / (purification[purificationCounter].TimeEnd - purification[purificationCounter].TimeStart) / 60 / 10;
+                
 
                 pumpA += pumpAspacing;
                 pumpB += pumpBspacing;
@@ -233,6 +234,10 @@ namespace WebSocketServerSimulation
                 }
                 else
                 {
+                    if (tubeNum == -1)
+                    {
+                        tubeNum = 0;
+                    }
                     nowtubeml += (double)purification[purificationCounter].FlowRate / 600;
                     if (nowtubeml >= tubeml)
                     {
@@ -254,6 +259,10 @@ namespace WebSocketServerSimulation
                 if (time >= purification[purificationCounter].TimeEnd)
                 {
                     purificationCounter++;
+                    pumpA = purification[purificationCounter].PumpAStart;
+                    pumpB = purification[purificationCounter].PumpBStart;
+                    pumpC = purification[purificationCounter].PumpCStart;
+                    pumpD = purification[purificationCounter].PumpDStart;
                 }
             }
             else if (washcycleCounter <= washcycle.Count - 1)
@@ -317,6 +326,10 @@ namespace WebSocketServerSimulation
                 if (time >= washcycle[washcycleCounter].TimeEnd)
                 {
                     washcycleCounter++;
+                    pumpA = washcycle[washcycleCounter].PumpAStart;
+                    pumpB = washcycle[washcycleCounter].PumpBStart;
+                    pumpC = washcycle[washcycleCounter].PumpCStart;
+                    pumpD = washcycle[washcycleCounter].PumpDStart;
                 }
             }
             else
