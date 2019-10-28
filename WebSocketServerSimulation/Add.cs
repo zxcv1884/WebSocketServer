@@ -161,6 +161,8 @@ namespace testserver
                 pumpD = 0;
                 waste = 0;
                 holding = 0;
+                purificationCounter = 0;
+                washcycleCounter = 0;
             }
             else if(data == "pause")
             {
