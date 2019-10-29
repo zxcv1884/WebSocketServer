@@ -35,6 +35,10 @@ namespace WebSocketServerSimulation
         private static double pumpCml=0;
         private static double pumpDml=0;
         private static double pressure;
+        private static double pressureA;
+        private static double pressureB;
+        private static double pressureC;
+        private static double pressureD;
         private static double wavelength;
         private static double au;
         private static double waste=0;
@@ -186,6 +190,10 @@ namespace WebSocketServerSimulation
                     pumpCml,
                     pumpDml,
                     pressure,
+                    pressureA,
+                    pressureB,
+                    pressureC,
+                    pressureD,
                     waste,
                     holding,
                     au,
@@ -252,6 +260,11 @@ namespace WebSocketServerSimulation
                 }
                 Random random = new Random();
                 pressure = random.Next(20, 50);
+                pressureA = random.Next(20, 50);
+                pressureB = random.Next(20, 50);
+                pressureC = random.Next(20, 50);
+                pressureD = random.Next(20, 50);
+
                 au = random.Next(0, 100);
                 wavelength = random.Next(0, 100);
 
@@ -323,6 +336,11 @@ namespace WebSocketServerSimulation
                 }
                 Random random = new Random();
                 pressure = random.Next(20, 50);
+                pressureA = random.Next(20, 50);
+                pressureB = random.Next(20, 50);
+                pressureC = random.Next(20, 50);
+                pressureD = random.Next(20, 50);
+
                 au = random.Next(0, 100);
                 wavelength = random.Next(0, 100);
                 time += 0.0016666666666667;
