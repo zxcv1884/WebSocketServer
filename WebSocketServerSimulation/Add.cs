@@ -61,18 +61,18 @@ namespace WebSocketServerSimulation
         }
         public class WashCycle
         {
-            public int TimeStart { get; set; }
-            public int TimeEnd { get; set; }
-            public int PumpAStart { get; set; }
-            public int PumpAEnd { get; set; }
-            public int PumpBStart { get; set; }
-            public int PumpBEnd { get; set; }
-            public int PumpCStart { get; set; }
-            public int PumpCEnd { get; set; }
-            public int PumpDStart { get; set; }
-            public int PumpDEnd { get; set; }
-            public int FlowRate { get; set; }
-            public int FlowDestination { get; set; }
+            public double TimeStart { get; set; }
+            public double TimeEnd { get; set; }
+            public double PumpAStart { get; set; }
+            public double PumpAEnd { get; set; }
+            public double PumpBStart { get; set; }
+            public double PumpBEnd { get; set; }
+            public double PumpCStart { get; set; }
+            public double PumpCEnd { get; set; }
+            public double PumpDStart { get; set; }
+            public double PumpDEnd { get; set; }
+            public double FlowRate { get; set; }
+            public double FlowDestination { get; set; }
         }
         List<Purification> purification = new List<Purification>();
         List<WashCycle> washcycle = new List<WashCycle>();
@@ -259,10 +259,13 @@ namespace WebSocketServerSimulation
                 if (time >= purification[purificationCounter].TimeEnd)
                 {
                     purificationCounter++;
-                    pumpA = purification[purificationCounter].PumpAStart;
-                    pumpB = purification[purificationCounter].PumpBStart;
-                    pumpC = purification[purificationCounter].PumpCStart;
-                    pumpD = purification[purificationCounter].PumpDStart;
+                    if(purification.Count > purificationCounter)
+                    {
+                        pumpA = purification[purificationCounter].PumpAStart;
+                        pumpB = purification[purificationCounter].PumpBStart;
+                        pumpC = purification[purificationCounter].PumpCStart;
+                        pumpD = purification[purificationCounter].PumpDStart;
+                    }    
                 }
             }
             else if (washcycleCounter <= washcycle.Count - 1)
@@ -326,15 +329,28 @@ namespace WebSocketServerSimulation
                 if (time >= washcycle[washcycleCounter].TimeEnd)
                 {
                     washcycleCounter++;
-                    pumpA = washcycle[washcycleCounter].PumpAStart;
-                    pumpB = washcycle[washcycleCounter].PumpBStart;
-                    pumpC = washcycle[washcycleCounter].PumpCStart;
-                    pumpD = washcycle[washcycleCounter].PumpDStart;
+                    if (washcycle.Count > washcycleCounter)
+                    {
+                        pumpA = washcycle[washcycleCounter].PumpAStart;
+                        pumpB = washcycle[washcycleCounter].PumpBStart;
+                        pumpC = washcycle[washcycleCounter].PumpCStart;
+                        pumpD = washcycle[washcycleCounter].PumpDStart;
+                    }
                 }
             }
             else
             {
                 status = 3;
+                time = 0;
+                pumpA = 0;
+                pumpB = 0;
+                pumpC = 0;
+                pumpD = 0;
+                waste = 0;
+                holding = 0;
+                purificationCounter = 0;
+                washcycleCounter = 0;
+                
             }
             Console.WriteLine("Status: " + status + "\tPeptide: " + peptide + "\tTubeNum: " + tubeNum + "\tTime: " + Math.Round(time, 2) + "\tPumpA: " + Math.Round(pumpA, 2) + "\tPumpB: " + Math.Round(pumpB, 2) + "\tPumpC: " + Math.Round(pumpC, 2) + "\tPumpD: " + Math.Round(pumpD, 2) + "\nPumpAml: " + Math.Round(pumpAml, 2) + "\tPumpBml: " + Math.Round(pumpBml, 2) + "\tPumpCml: " + Math.Round(pumpCml, 2) + "\tPumpDml: " + Math.Round(pumpDml, 2) + "\tWaste: " + Math.Round(waste, 2) + "\tHolding: " + Math.Round(holding, 2) + "\tPressure: " + Math.Round(pressure, 2) + "\tAU: " + Math.Round(au, 2) + "\tWaveLength: " + Math.Round(wavelength, 2));
             Console.WriteLine("-------------------------------------------------------------------------------------------------------------------------------------------");
@@ -343,6 +359,24 @@ namespace WebSocketServerSimulation
         {
             Console.WriteLine("Connection Closed");
             base.OnClose(e);
+            try
+            {
+                status = 2;
+                time = 0;
+                pumpA = 0;
+                pumpB = 0;
+                pumpC = 0;
+                pumpD = 0;
+                waste = 0;
+                holding = 0;
+                purificationCounter = 0;
+                washcycleCounter = 0;
+                RunTimer.Dispose();
+            }
+            catch
+            {
+
+            }
         }
 
         protected override void OnError(ErrorEventArgs e)
