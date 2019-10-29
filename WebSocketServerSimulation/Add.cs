@@ -224,7 +224,7 @@ namespace WebSocketServerSimulation
                 pumpB += pumpBspacing;
                 pumpC += pumpCspacing;
                 pumpD += pumpDspacing;
-                if (purification[purificationCounter].FlowDestination == 1)
+                if (purification[purificationCounter].FlowDestination == 2)
                 {
                     waste += (double)purification[purificationCounter].FlowRate / 600;
                     pumpAml = (double)pumpA * purification[purificationCounter].FlowRate * 0.01;
@@ -232,7 +232,7 @@ namespace WebSocketServerSimulation
                     pumpCml = (double)pumpC * purification[purificationCounter].FlowRate * 0.01;
                     pumpDml = (double)pumpD * purification[purificationCounter].FlowRate * 0.01;
                 }
-                else if (purification[purificationCounter].FlowDestination == 2)
+                else if (purification[purificationCounter].FlowDestination == 3)
                 {
                     holding += (double)purification[purificationCounter].FlowRate / 600;
                     pumpAml = (double)pumpA * purification[purificationCounter].FlowRate * 0.01;
