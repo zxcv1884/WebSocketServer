@@ -46,21 +46,22 @@ namespace WebSocketServerSimulation
         private static int purificationCounter=0;
         private static int washcycleCounter=0;
         private static int washcycleTemp = 0;
+        private static int flowDestination = 0;
         private static double tubeml;
         private static double nowtubeml;
         public class Purification
         {
-            public int TimeStart { get; set; }
-            public int TimeEnd { get; set; }
-            public int PumpAStart { get; set; }
-            public int PumpAEnd { get; set; }
-            public int PumpBStart { get; set; }
-            public int PumpBEnd { get; set; }
-            public int PumpCStart { get; set; }
-            public int PumpCEnd { get; set; }
-            public int PumpDStart { get; set; }
-            public int PumpDEnd { get; set; }
-            public int FlowRate { get; set; }
+            public double TimeStart { get; set; }
+            public double TimeEnd { get; set; }
+            public double PumpAStart { get; set; }
+            public double PumpAEnd { get; set; }
+            public double PumpBStart { get; set; }
+            public double PumpBEnd { get; set; }
+            public double PumpCStart { get; set; }
+            public double PumpCEnd { get; set; }
+            public double PumpDStart { get; set; }
+            public double PumpDEnd { get; set; }
+            public double FlowRate { get; set; }
             public int FlowDestination { get; set; }
         }
         public class WashCycle
@@ -76,7 +77,7 @@ namespace WebSocketServerSimulation
             public double PumpDStart { get; set; }
             public double PumpDEnd { get; set; }
             public double FlowRate { get; set; }
-            public double FlowDestination { get; set; }
+            public int FlowDestination { get; set; }
         }
         List<Purification> purification = new List<Purification>();
         List<WashCycle> washcycle = new List<WashCycle>();
@@ -146,6 +147,7 @@ namespace WebSocketServerSimulation
                     pumpD = 0;
                     waste = 0;
                     holding = 0;
+                    flowDestination = 0;
                     tubeml = TubeML;
                     status = Status;
                     peptide = Peptide;
@@ -167,6 +169,7 @@ namespace WebSocketServerSimulation
                 holding = 0;
                 purificationCounter = 0;
                 washcycleCounter = 0;
+                flowDestination = 0;
             }
             else if(data == "pause")
             {
@@ -198,6 +201,7 @@ namespace WebSocketServerSimulation
                     holding,
                     au,
                     wavelength,
+                    flowDestination
                 };
                 Send(JsonConvert.SerializeObject(root));
 
@@ -267,7 +271,7 @@ namespace WebSocketServerSimulation
 
                 au = random.Next(0, 100);
                 wavelength = random.Next(0, 100);
-
+                flowDestination = purification[purificationCounter].FlowDestination;
                 time += 0.0016666666666667;
                 if (time >= purification[purificationCounter].TimeEnd)
                 {
@@ -340,7 +344,7 @@ namespace WebSocketServerSimulation
                 pressureB = random.Next(20, 50);
                 pressureC = random.Next(20, 50);
                 pressureD = random.Next(20, 50);
-
+                flowDestination = washcycle[washcycleCounter].FlowDestination;
                 au = random.Next(0, 100);
                 wavelength = random.Next(0, 100);
                 time += 0.0016666666666667;
