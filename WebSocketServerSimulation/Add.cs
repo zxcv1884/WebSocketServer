@@ -178,32 +178,6 @@ namespace WebSocketServerSimulation
             }
             else
             {
-                var root = new
-                {
-                    status,
-                    peptide,
-                    tubeNum,
-                    time,
-                    pumpA,
-                    pumpB,
-                    pumpC,
-                    pumpD,
-                    pumpAml,
-                    pumpBml,
-                    pumpCml,
-                    pumpDml,
-                    pressure,
-                    pressureA,
-                    pressureB,
-                    pressureC,
-                    pressureD,
-                    waste,
-                    holding,
-                    au,
-                    wavelength,
-                    flowDestination
-                };
-                Send(JsonConvert.SerializeObject(root));
 
             }
         }
@@ -374,6 +348,32 @@ namespace WebSocketServerSimulation
                 washcycleCounter = 0;
                 
             }
+            var root = new
+            {
+                status,
+                peptide,
+                tubeNum,
+                time,
+                pumpA,
+                pumpB,
+                pumpC,
+                pumpD,
+                pumpAml,
+                pumpBml,
+                pumpCml,
+                pumpDml,
+                pressure,
+                pressureA,
+                pressureB,
+                pressureC,
+                pressureD,
+                waste,
+                holding,
+                au,
+                wavelength,
+                flowDestination
+            };
+            Send(JsonConvert.SerializeObject(root));
             Console.WriteLine("Status: " + status + "\tPeptide: " + peptide + "\tTubeNum: " + tubeNum + "\tTime: " + Math.Round(time, 2) + "\tPumpA: " + Math.Round(pumpA, 2) + "\tPumpB: " + Math.Round(pumpB, 2) + "\tPumpC: " + Math.Round(pumpC, 2) + "\tPumpD: " + Math.Round(pumpD, 2) + "\nPumpAml: " + Math.Round(pumpAml, 2) + "\tPumpBml: " + Math.Round(pumpBml, 2) + "\tPumpCml: " + Math.Round(pumpCml, 2) + "\tPumpDml: " + Math.Round(pumpDml, 2) + "\tWaste: " + Math.Round(waste, 2) + "\tHolding: " + Math.Round(holding, 2) + "\tPressure: " + Math.Round(pressure, 2) + "\tAU: " + Math.Round(au, 2) + "\tWaveLength: " + Math.Round(wavelength, 2));
             Console.WriteLine("-------------------------------------------------------------------------------------------------------------------------------------------");
         }
