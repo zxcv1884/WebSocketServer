@@ -183,6 +183,7 @@ namespace WebSocketServerSimulation
         }
         private void Run(Object o)
         {
+            int stopcount = 0;
             if (purificationCounter <= purification.Count - 1)
             {
                 if (time <= purification[purificationCounter].TimeStart)
@@ -373,11 +374,12 @@ namespace WebSocketServerSimulation
                 wavelength,
                 flowDestination
             };
-            Send(JsonConvert.SerializeObject(root));
-            Console.WriteLine("Status: " + status + "\tPeptide: " + peptide + "\tTubeNum: " + tubeNum + "\tTime: " + Math.Round(time, 2) + "\tPumpA: " + Math.Round(pumpA, 2) + "\tPumpB: " + Math.Round(pumpB, 2) + "\tPumpC: " + Math.Round(pumpC, 2) + "\tPumpD: " + Math.Round(pumpD, 2) + "\nPumpAml: " + Math.Round(pumpAml, 2) + "\tPumpBml: " + Math.Round(pumpBml, 2) + "\tPumpCml: " + Math.Round(pumpCml, 2) + "\tPumpDml: " + Math.Round(pumpDml, 2) + "\tWaste: " + Math.Round(waste, 2) + "\tHolding: " + Math.Round(holding, 2) + "\tPressure: " + Math.Round(pressure, 2) + "\tAU: " + Math.Round(au, 2) + "\tWaveLength: " + Math.Round(wavelength, 2));
-            Console.WriteLine("-------------------------------------------------------------------------------------------------------------------------------------------");
-            if (status == 3)
+            if (status == 3 && stopcount == 0)
             {
+                stopcount++;
+                Send(JsonConvert.SerializeObject(root));
+                Console.WriteLine("Status: " + status + "\tPeptide: " + peptide + "\tTubeNum: " + tubeNum + "\tTime: " + Math.Round(time, 2) + "\tPumpA: " + Math.Round(pumpA, 2) + "\tPumpB: " + Math.Round(pumpB, 2) + "\tPumpC: " + Math.Round(pumpC, 2) + "\tPumpD: " + Math.Round(pumpD, 2) + "\nPumpAml: " + Math.Round(pumpAml, 2) + "\tPumpBml: " + Math.Round(pumpBml, 2) + "\tPumpCml: " + Math.Round(pumpCml, 2) + "\tPumpDml: " + Math.Round(pumpDml, 2) + "\tWaste: " + Math.Round(waste, 2) + "\tHolding: " + Math.Round(holding, 2) + "\tPressure: " + Math.Round(pressure, 2) + "\tAU: " + Math.Round(au, 2) + "\tWaveLength: " + Math.Round(wavelength, 2));
+                Console.WriteLine("-------------------------------------------------------------------------------------------------------------------------------------------");
                 RunTimer.Dispose();
             }
         }
