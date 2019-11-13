@@ -148,7 +148,6 @@ namespace WebSocketServerSimulation
                     pumpB = 0;
                     pumpC = 0;
                     pumpD = 0;
-                    waste = 0;
                     holding = 0;
                     washcycleTemp = 0;
                     flowDestination = 0;
@@ -353,7 +352,7 @@ namespace WebSocketServerSimulation
             else
             {
                 status = 3;
-                flowtime = 0;
+                time = 0;
                 pumpA = 0;
                 pumpB = 0;
                 pumpC = 0;
