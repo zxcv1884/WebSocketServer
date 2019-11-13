@@ -358,7 +358,6 @@ namespace WebSocketServerSimulation
                 pumpB = 0;
                 pumpC = 0;
                 pumpD = 0;
-                waste = 0;
                 holding = 0;
                 washcycleTemp = 0;
                 purificationCounter = 0;
