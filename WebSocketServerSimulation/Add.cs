@@ -51,6 +51,8 @@ namespace WebSocketServerSimulation
         private static int flowDestination = 0;
         private static double tubeml;
         private static double nowtubeml;
+        private static double reagent;
+        private static double reagentml;
         public class Purification
         {
             public double TimeStart { get; set; }
@@ -122,11 +124,15 @@ namespace WebSocketServerSimulation
                     var Tubes = param["Tubes"].ToObject<int>();
                     var TubeNum = param["TubeNum"].ToObject<int>();
                     var TubeML = param["TubeML"].ToObject<int>();
+                    var Reagent = param["Reagent"].ToObject<int>();
+                    var ReagentML = param["ReagentML"].ToObject<int>();
                     tubeml = TubeML;
                     status = Status;
                     peptide = Peptide;
                     tubes = Tubes;
                     tubeNum = TubeNum;
+                    reagent = Reagent;
+                    reagentml = ReagentML;
                     RunTimer = new Timer(Run, null, 0, 100);
 
                     purification = param["Purification"].ToObject<List<Purification>>();
@@ -139,6 +145,8 @@ namespace WebSocketServerSimulation
                     var Tubes = param["Tubes"].ToObject<int>();
                     var TubeNum = param["TubeNum"].ToObject<int>();
                     var TubeML = param["TubeML"].ToObject<int>();
+                    var Reagent = param["Reagent"].ToObject<int>();
+                    var ReagentML = param["ReagentML"].ToObject<int>();
                     purification = param["Purification"].ToObject<List<Purification>>();
                     washcycle = param["WashCycle"].ToObject<List<WashCycle>>();
                     status = 0;
@@ -156,6 +164,8 @@ namespace WebSocketServerSimulation
                     peptide = Peptide;
                     tubes = Tubes;
                     tubeNum = TubeNum;
+                    reagent = Reagent;
+                    reagentml = ReagentML;
                     RunTimer = new Timer(Run, null, 0, 100);
                 }
             }
@@ -175,6 +185,8 @@ namespace WebSocketServerSimulation
                 washcycleCounter = 0;
                 flowDestination = 0;
                 washcycleTemp = 0;
+                reagent = 0;
+                reagentml = 0;
             }
             else if(data == "pause")
             {
@@ -255,7 +267,7 @@ namespace WebSocketServerSimulation
                 flowDestination = purification[purificationCounter].FlowDestination;
                 time += 0.0016666666666667;
                 flowtime += 0.0016666666666667;
-
+                reagentml -= 0.01;
                 if (time >= purification[purificationCounter].TimeEnd)
                 {
                     purificationCounter++;
@@ -337,6 +349,7 @@ namespace WebSocketServerSimulation
                 wavelength = random.Next(0, 100);
                 time += 0.0016666666666667;
                 flowtime += 0.0016666666666667;
+                reagentml -= 0.01;
                 if (time >= washcycle[washcycleCounter].TimeEnd)
                 {
                     washcycleCounter++;
@@ -358,6 +371,8 @@ namespace WebSocketServerSimulation
                 pumpC = 0;
                 pumpD = 0;
                 holding = 0;
+                reagent = 0;
+                reagentml = 0;
                 washcycleTemp = 0;
                 purificationCounter = 0;
                 washcycleCounter = 0;
@@ -384,6 +399,8 @@ namespace WebSocketServerSimulation
                 pressureB,
                 pressureC,
                 pressureD,
+                reagent,
+                reagentml,
                 waste,
                 holding,
                 au,
@@ -393,7 +410,7 @@ namespace WebSocketServerSimulation
             if(stopcount == 0)
             {
                 Send(JsonConvert.SerializeObject(root));
-                Console.WriteLine("Status: " + status +"Statusv2: " + statusv2 + "\tPeptide: " + peptide + "\tTubeNum: " + tubeNum + "\tTime: " + Math.Round(time, 2) + "\tFlowTime: " + Math.Round(flowtime, 2) + "\tPumpA: " + Math.Round(pumpA, 2) + "\tPumpB: " + Math.Round(pumpB, 2) + "\tPumpC: " + Math.Round(pumpC, 2) + "\tPumpD: " + Math.Round(pumpD, 2) + "\nPumpAml: " + Math.Round(pumpAml, 2) + "\tPumpBml: " + Math.Round(pumpBml, 2) + "\tPumpCml: " + Math.Round(pumpCml, 2) + "\tPumpDml: " + Math.Round(pumpDml, 2) + "\tWaste: " + Math.Round(waste, 2) + "\tHolding: " + Math.Round(holding, 2) + "\tPressure: " + Math.Round(pressure, 2) + "\tPressureA: " + Math.Round(pressureA, 2) + "\tPressureB: " + Math.Round(pressureB, 2) + "\tPressureC: " + Math.Round(pressureC, 2) + "\tPressureD: " + Math.Round(pressureD, 2) + "\tAU: " + Math.Round(au, 2) + "\tWaveLength: " + Math.Round(wavelength, 2));
+                Console.WriteLine("Status: " + status +"Statusv2: " + statusv2 + "\tPeptide: " + peptide + "\tTubeNum: " + tubeNum + "\tTime: " + Math.Round(time, 2) + "\tFlowTime: " + Math.Round(flowtime, 2) + "\tPumpA: " + Math.Round(pumpA, 2) + "\tPumpB: " + Math.Round(pumpB, 2) + "\tPumpC: " + Math.Round(pumpC, 2) + "\tPumpD: " + Math.Round(pumpD, 2) + "\nPumpAml: " + Math.Round(pumpAml, 2) + "\tPumpBml: " + Math.Round(pumpBml, 2) + "\tPumpCml: " + Math.Round(pumpCml, 2) + "\tPumpDml: " + Math.Round(pumpDml, 2) + "\tReagent: " + Math.Round(reagent, 2) + "\tReagentML: " + Math.Round(reagentml, 2) + "\tWaste: " + Math.Round(waste, 2) + "\tHolding: " + Math.Round(holding, 2) + "\tPressure: " + Math.Round(pressure, 2) + "\tPressureA: " + Math.Round(pressureA, 2) + "\tPressureB: " + Math.Round(pressureB, 2) + "\tPressureC: " + Math.Round(pressureC, 2) + "\tPressureD: " + Math.Round(pressureD, 2) + "\tAU: " + Math.Round(au, 2) + "\tWaveLength: " + Math.Round(wavelength, 2));
                 Console.WriteLine("-------------------------------------------------------------------------------------------------------------------------------------------");
 
             }
@@ -419,6 +436,8 @@ namespace WebSocketServerSimulation
                 pumpD = 0;
                 waste = 0;
                 holding = 0;
+                reagent = 0;
+                reagentml = 0;
                 washcycleTemp = 0;
                 purificationCounter = 0;
                 washcycleCounter = 0;
