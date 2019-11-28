@@ -376,7 +376,7 @@ namespace WebSocketServerSimulation
                 washcycleTemp = 0;
                 purificationCounter = 0;
                 washcycleCounter = 0;
-                
+                nowtubeml = 0;
             }
             var root = new
             {
