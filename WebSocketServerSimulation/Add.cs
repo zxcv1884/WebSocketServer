@@ -45,6 +45,7 @@ namespace WebSocketServerSimulation
         private static double au;
         private static double waste=0;
         private static double holding=0;
+        private static int Counter = 1;
         private static int purificationCounter=0;
         private static int washcycleCounter=0;
         private static int washcycleTemp = 0;
@@ -53,6 +54,7 @@ namespace WebSocketServerSimulation
         private static double nowtubeml;
         private static double reagent;
         private static double reagentml;
+
         public class Purification
         {
             public double TimeStart { get; set; }
@@ -270,6 +272,7 @@ namespace WebSocketServerSimulation
                 reagentml -= 0.01;
                 if (time >= purification[purificationCounter].TimeEnd)
                 {
+                    Counter++;
                     purificationCounter++;
                     if(purification.Count > purificationCounter)
                     {
@@ -286,6 +289,7 @@ namespace WebSocketServerSimulation
                 if (washcycleTemp == 0)
                 {
                     time = 0;
+                    Counter++;
                 }
                 washcycleTemp++;
                 if (time <= washcycle[washcycleCounter].TimeStart)
@@ -353,6 +357,7 @@ namespace WebSocketServerSimulation
                 if (time >= washcycle[washcycleCounter].TimeEnd)
                 {
                     washcycleCounter++;
+                    Counter++;
                     if (washcycle.Count > washcycleCounter)
                     {
                         pumpA = washcycle[washcycleCounter].PumpAStart;
@@ -375,6 +380,7 @@ namespace WebSocketServerSimulation
                 reagentml = 0;
                 washcycleTemp = 0;
                 purificationCounter = 0;
+                Counter = 1;
                 washcycleCounter = 0;
                 nowtubeml = 0;
             }
@@ -405,7 +411,9 @@ namespace WebSocketServerSimulation
                 holding,
                 au,
                 wavelength,
-                flowDestination
+                flowDestination,
+                Counter
+
             };
             if(stopcount == 0)
             {
@@ -439,6 +447,7 @@ namespace WebSocketServerSimulation
                 reagent = 0;
                 reagentml = 0;
                 washcycleTemp = 0;
+                Counter = 1;
                 purificationCounter = 0;
                 washcycleCounter = 0;
                 RunTimer.Dispose();
