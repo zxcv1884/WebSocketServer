@@ -54,6 +54,7 @@ namespace WebSocketServerSimulation
         private static double nowtubeml;
         private static double reagent;
         private static double reagentml;
+        private static double columnFlowRate;
 
         public class Purification
         {
@@ -128,6 +129,7 @@ namespace WebSocketServerSimulation
                     var TubeML = param["TubeML"].ToObject<int>();
                     var Reagent = param["Reagent"].ToObject<int>();
                     var ReagentML = param["ReagentML"].ToObject<int>();
+                    var ColumnFlowRate = param["ColumnFlowRate"].ToObject<int>();
                     tubeml = TubeML;
                     status = Status;
                     peptide = Peptide;
@@ -135,6 +137,7 @@ namespace WebSocketServerSimulation
                     tubeNum = TubeNum;
                     reagent = Reagent;
                     reagentml = ReagentML;
+                    columnFlowRate = ColumnFlowRate;
                     RunTimer = new Timer(Run, null, 0, 100);
 
                     purification = param["Purification"].ToObject<List<Purification>>();
@@ -149,6 +152,7 @@ namespace WebSocketServerSimulation
                     var TubeML = param["TubeML"].ToObject<int>();
                     var Reagent = param["Reagent"].ToObject<int>();
                     var ReagentML = param["ReagentML"].ToObject<int>();
+                    var ColumnFlowRate = param["ColumnFlowRate"].ToObject<int>();
                     purification = param["Purification"].ToObject<List<Purification>>();
                     washcycle = param["WashCycle"].ToObject<List<WashCycle>>();
                     status = 0;
@@ -168,6 +172,7 @@ namespace WebSocketServerSimulation
                     tubeNum = TubeNum;
                     reagent = Reagent;
                     reagentml = ReagentML;
+                    columnFlowRate = ColumnFlowRate;
                     RunTimer = new Timer(Run, null, 0, 100);
                 }
             }
@@ -189,6 +194,7 @@ namespace WebSocketServerSimulation
                 washcycleTemp = 0;
                 reagent = 0;
                 reagentml = 0;
+                columnFlowRate = 0;
             }
             else if(data == "pause")
             {
@@ -225,7 +231,7 @@ namespace WebSocketServerSimulation
                 pumpD += pumpDspacing;
                 if (purification[purificationCounter].FlowDestination == 2)
                 {
-                    waste += (double)purification[purificationCounter].FlowRate / 600;
+                    waste += (double)columnFlowRate / 600;
                     pumpAml = (double)pumpA * purification[purificationCounter].FlowRate * 0.01;
                     pumpBml = (double)pumpB * purification[purificationCounter].FlowRate * 0.01;
                     pumpCml = (double)pumpC * purification[purificationCounter].FlowRate * 0.01;
@@ -233,7 +239,7 @@ namespace WebSocketServerSimulation
                 }
                 else if (purification[purificationCounter].FlowDestination == 3)
                 {
-                    holding += (double)purification[purificationCounter].FlowRate / 600;
+                    holding += (double)columnFlowRate / 600;
                     pumpAml = (double)pumpA * purification[purificationCounter].FlowRate * 0.01;
                     pumpBml = (double)pumpB * purification[purificationCounter].FlowRate * 0.01;
                     pumpCml = (double)pumpC * purification[purificationCounter].FlowRate * 0.01;
@@ -245,8 +251,8 @@ namespace WebSocketServerSimulation
                     {
                         tubeNum = 0;
                     }
-                    nowtubeml += (double)purification[purificationCounter].FlowRate / 600;
-                    if (nowtubeml >= tubeml)
+                    nowtubeml += (double)columnFlowRate / 600;
+                    if (nowtubeml >= tubeml*0.75)
                     {
                         tubeNum++;
                         nowtubeml = 0;
@@ -289,7 +295,6 @@ namespace WebSocketServerSimulation
                 if (washcycleTemp == 0)
                 {
                     time = 0;
-                    Counter++;
                 }
                 washcycleTemp++;
                 if (time <= washcycle[washcycleCounter].TimeStart)
@@ -310,7 +315,7 @@ namespace WebSocketServerSimulation
                 pumpD += pumpDspacing;
                 if (washcycle[washcycleCounter].FlowDestination == 2)
                 {
-                    waste += (double)washcycle[washcycleCounter].FlowRate / 600;
+                    waste += (double)columnFlowRate / 600;
                     pumpAml = (double)pumpA * washcycle[washcycleCounter].FlowRate * 0.01;
                     pumpBml = (double)pumpB * washcycle[washcycleCounter].FlowRate * 0.01;
                     pumpCml = (double)pumpC * washcycle[washcycleCounter].FlowRate * 0.01;
@@ -318,7 +323,7 @@ namespace WebSocketServerSimulation
                 }
                 else if (washcycle[washcycleCounter].FlowDestination == 3)
                 {
-                    holding += (double)washcycle[washcycleCounter].FlowRate / 600;
+                    holding += (double)columnFlowRate / 600;
                     pumpAml = (double)pumpA * washcycle[washcycleCounter].FlowRate * 0.01;
                     pumpBml = (double)pumpB * washcycle[washcycleCounter].FlowRate * 0.01;
                     pumpCml = (double)pumpC * washcycle[washcycleCounter].FlowRate * 0.01;
@@ -330,8 +335,8 @@ namespace WebSocketServerSimulation
                     {
                         tubeNum = 0;
                     }
-                    nowtubeml += (double)washcycle[washcycleCounter].FlowRate / 600;
-                    if (nowtubeml >= tubeml)
+                    nowtubeml += (double)columnFlowRate / 600;
+                    if (nowtubeml >= tubeml*0.75)
                     {
                         tubeNum++;
                         nowtubeml = 0;
@@ -415,11 +420,12 @@ namespace WebSocketServerSimulation
                 Counter
 
             };
+
             if(stopcount == 0)
             {
                 Send(JsonConvert.SerializeObject(root));
-               // Console.WriteLine("Status: " + status +"Statusv2: " + statusv2 + "\tPeptide: " + peptide + "\tTubeNum: " + tubeNum + "\tTime: " + Math.Round(time, 2) + "\tFlowTime: " + Math.Round(flowtime, 2) + "\tPumpA: " + Math.Round(pumpA, 2) + "\tPumpB: " + Math.Round(pumpB, 2) + "\tPumpC: " + Math.Round(pumpC, 2) + "\tPumpD: " + Math.Round(pumpD, 2) + "\nPumpAml: " + Math.Round(pumpAml, 2) + "\tPumpBml: " + Math.Round(pumpBml, 2) + "\tPumpCml: " + Math.Round(pumpCml, 2) + "\tPumpDml: " + Math.Round(pumpDml, 2) + "\tReagent: " + Math.Round(reagent, 2) + "\tReagentML: " + Math.Round(reagentml, 2) + "\tWaste: " + Math.Round(waste, 2) + "\tHolding: " + Math.Round(holding, 2) + "\tPressure: " + Math.Round(pressure, 2) + "\tPressureA: " + Math.Round(pressureA, 2) + "\tPressureB: " + Math.Round(pressureB, 2) + "\tPressureC: " + Math.Round(pressureC, 2) + "\tPressureD: " + Math.Round(pressureD, 2) + "\tAU: " + Math.Round(au, 2) + "\tWaveLength: " + Math.Round(wavelength, 2));
-               // Console.WriteLine("-------------------------------------------------------------------------------------------------------------------------------------------");
+                Console.WriteLine("Status: " + status +"Statusv2: " + statusv2 + "\tPeptide: " + peptide + "\tTubeNum: " + tubeNum + "\tTime: " + Math.Round(time, 2) + "\tFlowTime: " + Math.Round(flowtime, 2) + "\tPumpA: " + Math.Round(pumpA, 2) + "\tPumpB: " + Math.Round(pumpB, 2) + "\tPumpC: " + Math.Round(pumpC, 2) + "\tPumpD: " + Math.Round(pumpD, 2) + "\nPumpAml: " + Math.Round(pumpAml, 2) + "\tPumpBml: " + Math.Round(pumpBml, 2) + "\tPumpCml: " + Math.Round(pumpCml, 2) + "\tPumpDml: " + Math.Round(pumpDml, 2) + "\tReagent: " + Math.Round(reagent, 2) + "\tReagentML: " + Math.Round(reagentml, 2) + "\tWaste: " + Math.Round(waste, 2) + "\tHolding: " + Math.Round(holding, 2) + "\tPressure: " + Math.Round(pressure, 2) + "\tPressureA: " + Math.Round(pressureA, 2) + "\tPressureB: " + Math.Round(pressureB, 2) + "\tPressureC: " + Math.Round(pressureC, 2) + "\tPressureD: " + Math.Round(pressureD, 2) + "\tAU: " + Math.Round(au, 2) + "\tWaveLength: " + Math.Round(wavelength, 2));
+                Console.WriteLine("-------------------------------------------------------------------------------------------------------------------------------------------");
 
             }
             if (status == 3 && stopcount == 0)
