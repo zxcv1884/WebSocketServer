@@ -129,7 +129,7 @@ namespace WebSocketServerSimulation
                     var TubeML = param["TubeML"].ToObject<int>();
                     var Reagent = param["Reagent"].ToObject<int>();
                     var ReagentML = param["ReagentML"].ToObject<int>();
-                   // var ColumnFlowRate = param["ColumnFlowRate"].ToObject<int>();
+                    var ColumnFlowRate = param["ColumnFlowRate"].ToObject<int>();
                     tubeml = TubeML;
                     status = Status;
                     peptide = Peptide;
@@ -137,7 +137,7 @@ namespace WebSocketServerSimulation
                     tubeNum = TubeNum;
                     reagent = Reagent;
                     reagentml = ReagentML;
-                  //  columnFlowRate = ColumnFlowRate;
+                    columnFlowRate = ColumnFlowRate;
                     RunTimer = new Timer(Run, null, 0, 100);
 
                     purification = param["Purification"].ToObject<List<Purification>>();
@@ -152,7 +152,7 @@ namespace WebSocketServerSimulation
                     var TubeML = param["TubeML"].ToObject<int>();
                     var Reagent = param["Reagent"].ToObject<int>();
                     var ReagentML = param["ReagentML"].ToObject<int>();
-                   // var ColumnFlowRate = param["ColumnFlowRate"].ToObject<int>();
+                    var ColumnFlowRate = param["ColumnFlowRate"].ToObject<int>();
                     purification = param["Purification"].ToObject<List<Purification>>();
                     washcycle = param["WashCycle"].ToObject<List<WashCycle>>();
                     status = 0;
@@ -173,7 +173,7 @@ namespace WebSocketServerSimulation
                     tubeNum = TubeNum;
                     reagent = Reagent;
                     reagentml = ReagentML;
-                  //  columnFlowRate = ColumnFlowRate;
+                    columnFlowRate = ColumnFlowRate;
                     RunTimer = new Timer(Run, null, 0, 100);
                 }
             }
