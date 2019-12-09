@@ -165,6 +165,7 @@ namespace WebSocketServerSimulation
                     holding = 0;
                     washcycleTemp = 0;
                     flowDestination = 0;
+                    Counter = 1;
                     tubeml = TubeML;
                     status = Status;
                     peptide = Peptide;
@@ -388,7 +389,6 @@ namespace WebSocketServerSimulation
                 reagentml = 0;
                 washcycleTemp = 0;
                 purificationCounter = 0;
-                Counter = 1;
                 washcycleCounter = 0;
                 nowtubeml = 0;
             }
