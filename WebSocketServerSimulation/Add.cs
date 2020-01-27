@@ -222,11 +222,13 @@ namespace WebSocketServerSimulation
                     pumpC = purification[purificationCounter].PumpCStart;
                     pumpD = purification[purificationCounter].PumpDStart;
                 }
-                pumpAspacing = (double)(purification[purificationCounter].PumpAEnd - purification[purificationCounter].PumpAStart) / (purification[purificationCounter].TimeEnd - purification[purificationCounter].TimeStart) / 60 / 10;
-                pumpBspacing = (double)(purification[purificationCounter].PumpBEnd - purification[purificationCounter].PumpBStart) / (purification[purificationCounter].TimeEnd - purification[purificationCounter].TimeStart) / 60 / 10;
-                pumpCspacing = (double)(purification[purificationCounter].PumpCEnd - purification[purificationCounter].PumpCStart) / (purification[purificationCounter].TimeEnd - purification[purificationCounter].TimeStart) / 60 / 10;
-                pumpDspacing = (double)(purification[purificationCounter].PumpDEnd - purification[purificationCounter].PumpDStart) / (purification[purificationCounter].TimeEnd - purification[purificationCounter].TimeStart) / 60 / 10;
-                
+                if(purification[purificationCounter].TimeEnd!= 0)
+                {
+                    pumpAspacing = (double)(purification[purificationCounter].PumpAEnd - purification[purificationCounter].PumpAStart) / (purification[purificationCounter].TimeEnd - purification[purificationCounter].TimeStart) / 60 / 10;
+                    pumpBspacing = (double)(purification[purificationCounter].PumpBEnd - purification[purificationCounter].PumpBStart) / (purification[purificationCounter].TimeEnd - purification[purificationCounter].TimeStart) / 60 / 10;
+                    pumpCspacing = (double)(purification[purificationCounter].PumpCEnd - purification[purificationCounter].PumpCStart) / (purification[purificationCounter].TimeEnd - purification[purificationCounter].TimeStart) / 60 / 10;
+                    pumpDspacing = (double)(purification[purificationCounter].PumpDEnd - purification[purificationCounter].PumpDStart) / (purification[purificationCounter].TimeEnd - purification[purificationCounter].TimeStart) / 60 / 10;
+                }
 
                 pumpA += pumpAspacing;
                 pumpB += pumpBspacing;
@@ -312,11 +314,13 @@ namespace WebSocketServerSimulation
                     pumpC = washcycle[washcycleCounter].PumpCStart;
                     pumpD = washcycle[washcycleCounter].PumpDStart;
                 }
-                pumpAspacing = (double)(washcycle[washcycleCounter].PumpAEnd - washcycle[washcycleCounter].PumpAStart) / (washcycle[washcycleCounter].TimeEnd - washcycle[washcycleCounter].TimeStart) / 60 / 10;
-                pumpBspacing = (double)(washcycle[washcycleCounter].PumpBEnd - washcycle[washcycleCounter].PumpBStart) / (washcycle[washcycleCounter].TimeEnd - washcycle[washcycleCounter].TimeStart) / 60 / 10;
-                pumpCspacing = (double)(washcycle[washcycleCounter].PumpCEnd - washcycle[washcycleCounter].PumpCStart) / (washcycle[washcycleCounter].TimeEnd - washcycle[washcycleCounter].TimeStart) / 60 / 10;
-                pumpDspacing = (double)(washcycle[washcycleCounter].PumpDEnd - washcycle[washcycleCounter].PumpDStart) / (washcycle[washcycleCounter].TimeEnd - washcycle[washcycleCounter].TimeStart) / 60 / 10;
-
+                if(washcycle[washcycleCounter].TimeEnd != 0)
+                {
+                    pumpAspacing = (double)(washcycle[washcycleCounter].PumpAEnd - washcycle[washcycleCounter].PumpAStart) / (washcycle[washcycleCounter].TimeEnd - washcycle[washcycleCounter].TimeStart) / 60 / 10;
+                    pumpBspacing = (double)(washcycle[washcycleCounter].PumpBEnd - washcycle[washcycleCounter].PumpBStart) / (washcycle[washcycleCounter].TimeEnd - washcycle[washcycleCounter].TimeStart) / 60 / 10;
+                    pumpCspacing = (double)(washcycle[washcycleCounter].PumpCEnd - washcycle[washcycleCounter].PumpCStart) / (washcycle[washcycleCounter].TimeEnd - washcycle[washcycleCounter].TimeStart) / 60 / 10;
+                    pumpDspacing = (double)(washcycle[washcycleCounter].PumpDEnd - washcycle[washcycleCounter].PumpDStart) / (washcycle[washcycleCounter].TimeEnd - washcycle[washcycleCounter].TimeStart) / 60 / 10;
+                }
                 pumpA += pumpAspacing;
                 pumpB += pumpBspacing;
                 pumpC += pumpCspacing;
